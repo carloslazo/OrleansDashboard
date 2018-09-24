@@ -7,6 +7,6 @@ module.exports = class Reports extends React.Component {
   }
 
   render() {
-    return <MultipleGrainGraphs grainStats={this.props.grainStats}/>
+    return <MultipleGrainGraphs grainStats={this.props.grainStats} grainStatsTest={this.props.grainStatsTest}/>
   }
 };

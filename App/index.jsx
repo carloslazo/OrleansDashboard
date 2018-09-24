@@ -18,6 +18,7 @@ const SiloCounters = require('./silos/silo-counters.jsx');
 const Reminders = require('./reminders/reminders.jsx');
 const Preferences = require('./components/preferences.jsx');
 const storage = require("./lib/storage");
+const JsonTextForm = require("./components/json-text-form.jsx")
 
 const target = document.getElementById("content");
 
@@ -32,6 +33,7 @@ let settings = {
 };
 
 // Global state.
+const Reports = require('./reports/reports.jsx')
 var dashboardCounters = {};
 var unfilteredDashboardCounters = {};
 var routeIndex = 0;
@@ -71,10 +73,10 @@ function getVersion() {
     var version = '2';
     var renderVersion = function(){
         ReactDom.render(<span id="version">
-            v.{version} 
+            v.{version}
             <i style={{marginLeft:"12px", marginRight:"5px"}} className="fa fa-github"></i>
             <a style={{color:"white", textDecoration:"underline"}} href="https://github.com/OrleansContrib/OrleansDashboard/">Source</a>
-        </span>, document.getElementById('version-content'));    
+        </span>, document.getElementById('version-content'));
     }
 
     var loadData = function(cb){
@@ -124,8 +126,8 @@ routie('', function(){
                 grainMethodStats = grainMethodsData
                 unfiltedMethodStats = grainMethodsData;
                 grainMethodStats.calls = unfiltedMethodStats.calls.filter(getFilter(settings));
-                grainMethodStats.errors = unfiltedMethodStats.errors.filter(getFilter(settings));                
-                grainMethodStats.latency = unfiltedMethodStats.latency.filter(getFilter(settings));                
+                grainMethodStats.errors = unfiltedMethodStats.errors.filter(getFilter(settings));
+                grainMethodStats.latency = unfiltedMethodStats.latency.filter(getFilter(settings));
                 render();
             })
         });
@@ -338,6 +340,83 @@ routie("/preferences", function() {
   render();
 });
 
+routie('/saved', function () {
+    var thisRouteIndex = ++routeIndex;
+    events.clearAll();
+    scroll();
+    renderLoading();
+
+    render = function () {
+        if (routeIndex != thisRouteIndex) return;
+        renderPage(<Page><JsonTextForm/></Page>, "#/saved");
+    }
+    render();
+
+});
+
+
+
+
+
+routie('/reports', function () {
+    var thisRouteIndex = ++routeIndex;
+    events.clearAll();
+    scroll();
+    renderLoading();
+
+    render = function () {
+        if (routeIndex != thisRouteIndex) return;
+        renderPage(<Page><JsonTextForm/></Page>, "#/reports");
+    }
+    render();
+
+});
+
+
+
+
+
+
+routie('/reports/savedgraphs', function () {
+    var thisRouteIndex = ++routeIndex;
+    events.clearAll();
+    scroll();
+    renderLoading();
+    var grainStats = {}
+var grainTest = JSON.parse(storage.get("grainTest"))
+    var loadData = function () {
+        Object.keys(grainTest).map(x => {
+            http.get('GrainStats/' + x, function (err, data) {
+                grainStats[x] = data;
+                render();
+            });
+        })
+
+    }
+
+    render = function () {
+        if (routeIndex != thisRouteIndex) return;
+        renderPage(<Page><Reports grainStats={grainStats} grainStatsTest={grainTest}/></Page>, "#/reports");
+    }
+
+    events.on('dashboard-counters', render);
+    events.on('refresh', loadData);
+
+    loadData();
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
 setInterval(() => events.emit('refresh'), 1000);
 setInterval(() => events.emit('long-refresh'), 10000);
 
@@ -376,6 +455,16 @@ function getMenu(){
             icon:"fa fa-bars"
         });
     }
+
+    result.push({
+      name:"Reports",
+      path: "#/reports",
+    })
+    result.push({
+      name:"Saved",
+      path: "#/saved",
+    })
+
 
     result.push({
       name: "Preferences",
