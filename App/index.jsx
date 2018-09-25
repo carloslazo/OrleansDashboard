@@ -19,6 +19,7 @@ const Reminders = require('./reminders/reminders.jsx');
 const Preferences = require('./components/preferences.jsx');
 const storage = require("./lib/storage");
 const JsonTextForm = require("./components/json-text-form.jsx")
+const SavedTable = require("./components/saved-table.jsx")
 
 const target = document.getElementById("content");
 
@@ -340,24 +341,6 @@ routie("/preferences", function() {
   render();
 });
 
-routie('/saved', function () {
-    var thisRouteIndex = ++routeIndex;
-    events.clearAll();
-    scroll();
-    renderLoading();
-
-    render = function () {
-        if (routeIndex != thisRouteIndex) return;
-        renderPage(<Page><JsonTextForm/></Page>, "#/saved");
-    }
-    render();
-
-});
-
-
-
-
-
 routie('/reports', function () {
     var thisRouteIndex = ++routeIndex;
     events.clearAll();
@@ -366,7 +349,31 @@ routie('/reports', function () {
 
     render = function () {
         if (routeIndex != thisRouteIndex) return;
-        renderPage(<Page><JsonTextForm/></Page>, "#/reports");
+        renderPage(<Page><SavedTable savedGrains={savedGrains}/></Page>, "#/reports");
+    }
+    render();
+
+});
+
+let savedGrains = JSON.parse(storage.get("savedGrains"))
+
+routie('/reports/json', function () {
+    var thisRouteIndex = ++routeIndex;
+    events.clearAll();
+    scroll();
+    renderLoading();
+
+    let getSavedGrain = (fieldInput, name) =>{
+      savedGrains = {...savedGrains,}
+      fieldInput = JSON.parse(fieldInput)
+      savedGrains[name] = fieldInput
+      savedGrainsString = JSON.stringify(savedGrains)
+      storage.put("savedGrains", savedGrainsString)
+    }
+
+    render = function () {
+        if (routeIndex != thisRouteIndex) return;
+        renderPage(<Page><JsonTextForm getSavedGrain={getSavedGrain}/></Page>, "#/reports/json");
     }
     render();
 
@@ -374,37 +381,37 @@ routie('/reports', function () {
 
 
 
+routie("/reports/:savedGraphs", function(savedGraphs) {
+  var thisRouteIndex = ++routeIndex;
+  events.clearAll();
+  scroll();
+  renderLoading();
+  var grainStats = {};
+  var loadData = function() {
+    Object.keys(savedGrains[savedGraphs]).map(x => {
+      http.get("GrainStats/" + x, function(err, data) {
+        grainStats[x] = data;
+        render();
+      });
+    });
+  };
 
+  render = function() {
+    if (routeIndex != thisRouteIndex) return;
+    renderPage(
+      <Page>
+        <Reports grainStats={grainStats} savedGrainReport={savedGrains[savedGraphs]} />
+      </Page>,
+      "#/reports"
+    );
+  };
 
+  events.on("dashboard-counters", render);
+  events.on("refresh", loadData);
 
-routie('/reports/savedgraphs', function () {
-    var thisRouteIndex = ++routeIndex;
-    events.clearAll();
-    scroll();
-    renderLoading();
-    var grainStats = {}
-var grainTest = JSON.parse(storage.get("grainTest"))
-    var loadData = function () {
-        Object.keys(grainTest).map(x => {
-            http.get('GrainStats/' + x, function (err, data) {
-                grainStats[x] = data;
-                render();
-            });
-        })
-
-    }
-
-    render = function () {
-        if (routeIndex != thisRouteIndex) return;
-        renderPage(<Page><Reports grainStats={grainStats} grainStatsTest={grainTest}/></Page>, "#/reports");
-    }
-
-    events.on('dashboard-counters', render);
-    events.on('refresh', loadData);
-
-    loadData();
-
+  loadData();
 });
+
 
 
 
@@ -459,10 +466,6 @@ function getMenu(){
     result.push({
       name:"Reports",
       path: "#/reports",
-    })
-    result.push({
-      name:"Saved",
-      path: "#/saved",
     })
 
 

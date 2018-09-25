@@ -1,5 +1,5 @@
 var React = require("react");
-const MultipleGrainGraphs = require("../components/multiple-grain-graphs.jsx")
+const MultipleGrainGraphs = require("../components/multiple-grain-graphs.jsx");
 module.exports = class Reports extends React.Component {
   constructor(props) {
     super(props);
@@ -7,6 +7,11 @@ module.exports = class Reports extends React.Component {
   }
 
   render() {
-    return <MultipleGrainGraphs grainStats={this.props.grainStats} grainStatsTest={this.props.grainStatsTest}/>
+    return (
+      <MultipleGrainGraphs
+        grainStats={this.props.grainStats}
+        savedGrainReport={this.props.savedGrainReport}
+      />
+    );
   }
 };

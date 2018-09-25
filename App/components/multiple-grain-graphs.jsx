@@ -1,5 +1,5 @@
 var React = require("react");
-const GrainGraph = require("./grain-graph.jsx")
+const GrainGraph = require("./grain-graph.jsx");
 // add multiple axis to the chart
 // https://jsfiddle.net/devonuto/pa7k6xn9/
 module.exports = class MultipleGrainGraphs extends React.Component {
@@ -11,7 +11,7 @@ module.exports = class MultipleGrainGraphs extends React.Component {
       .sort()
       .map(grainType =>
         Object.keys(this.props.grainStats[grainType]).map(grainMethod => {
-          if (this.props.grainStatsTest[grainType].includes(grainMethod)) {
+          if (this.props.savedGrainReport[grainType].includes(grainMethod)) {
             return (
               <GrainGraph
                 stats={this.props.grainStats[grainType][grainMethod]}
@@ -49,6 +49,6 @@ module.exports = class MultipleGrainGraphs extends React.Component {
 };
 
 function getName(value) {
-    var parts = value.split(".");
-    return parts[parts.length - 1];
+  var parts = value.split(".");
+  return parts[parts.length - 1];
 }
