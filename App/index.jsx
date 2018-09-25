@@ -315,7 +315,6 @@ routie("/preferences", function() {
     settings = {
       ...settings,
     }
-
     if (newSettings.hasOwnProperty('dashboardGrainsHidden')) {
       storage.put("dashboardGrains", newSettings.dashboardGrainsHidden ? "hidden" : "visible")
       settings.dashboardGrainsHidden = newSettings.dashboardGrainsHidden
@@ -341,21 +340,33 @@ routie("/preferences", function() {
   render();
 });
 
-routie('/reports', function () {
-    var thisRouteIndex = ++routeIndex;
-    events.clearAll();
-    scroll();
-    renderLoading();
+routie("/reports", function() {
+  var thisRouteIndex = ++routeIndex;
+  events.clearAll();
+  scroll();
+  renderLoading();
 
-    render = function () {
-        if (routeIndex != thisRouteIndex) return;
-        renderPage(<Page><SavedTable savedGrains={savedGrains}/></Page>, "#/reports");
-    }
+  let deleteGrain = name => {
+    savedGrains = { ...savedGrains };
+    delete savedGrains[name];
+    savedGrainsString = JSON.stringify(savedGrains);
+    storage.put("savedGrains", savedGrainsString);
     render();
+  };
 
+  render = function() {
+    if (routeIndex != thisRouteIndex) return;
+    renderPage(
+      <Page>
+        <SavedTable savedGrains={savedGrains} deleteGrain={deleteGrain} />
+      </Page>,
+      "#/reports"
+    );
+  };
+  render();
 });
 
-let savedGrains = JSON.parse(storage.get("savedGrains"))
+let savedGrains = storage.get("savedGrains") != undefined ? JSON.parse(storage.get("savedGrains")) : {}
 
 routie('/reports/json', function () {
     var thisRouteIndex = ++routeIndex;
