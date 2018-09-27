@@ -21,6 +21,8 @@ module.exports = class SavedTable extends React.Component {
             Delete {key}
           </a>
           <br />
+          <a href={`/#/reports/${key}/json`}>Edit {key}</a>
+          <br />
           <a href={`#/reports/${key}`}>View {key}</a>
         </div>
       );
@@ -31,7 +33,7 @@ module.exports = class SavedTable extends React.Component {
     return (
       <div>
         <h1>
-          <a href={`#/reports/json`}>Add New</a>
+          <a href={`#/reports/Untitled/json`}>Add New</a>
         </h1>
         {this.mapSavedObjects()}
       </div>

@@ -11,6 +11,7 @@ module.exports = class Reports extends React.Component {
       <MultipleGrainGraphs
         grainStats={this.props.grainStats}
         savedGrainReport={this.props.savedGrainReport}
+        savedGraphs={this.props.savedGraphs}
       />
     );
   }

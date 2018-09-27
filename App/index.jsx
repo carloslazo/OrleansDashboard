@@ -368,7 +368,7 @@ routie("/reports", function() {
 
 let savedGrains = storage.get("savedGrains") != undefined ? JSON.parse(storage.get("savedGrains")) : {}
 
-routie('/reports/json', function () {
+routie('/reports/:custom/json', function (custom) {
     var thisRouteIndex = ++routeIndex;
     events.clearAll();
     scroll();
@@ -382,9 +382,10 @@ routie('/reports/json', function () {
       storage.put("savedGrains", savedGrainsString)
     }
 
+
     render = function () {
         if (routeIndex != thisRouteIndex) return;
-        renderPage(<Page><JsonTextForm getSavedGrain={getSavedGrain}/></Page>, "#/reports/json");
+        renderPage(<Page title="Report form"><JsonTextForm getSavedGrain={getSavedGrain} CustomName={custom} savedGrains={savedGrains}/></Page>, "#/reports/json");
     }
     render();
 
@@ -411,7 +412,7 @@ routie("/reports/:savedGraphs", function(savedGraphs) {
     if (routeIndex != thisRouteIndex) return;
     renderPage(
       <Page>
-        <Reports grainStats={grainStats} savedGrainReport={savedGrains[savedGraphs]} />
+        <Reports grainStats={grainStats} savedGrainReport={savedGrains[savedGraphs]} savedGraphs={savedGraphs}/>
       </Page>,
       "#/reports"
     );

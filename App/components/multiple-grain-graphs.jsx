@@ -1,5 +1,7 @@
 var React = require("react");
 const GrainGraph = require("./grain-graph.jsx");
+var Page = require("../components/page.jsx");
+
 // add multiple axis to the chart
 // https://jsfiddle.net/devonuto/pa7k6xn9/
 module.exports = class MultipleGrainGraphs extends React.Component {
@@ -25,7 +27,7 @@ module.exports = class MultipleGrainGraphs extends React.Component {
 
   renderGraphs() {
     return (
-      <div>
+      <Page  title={getName(this.props.savedGraphs)} subTitle={this.props.savedGraphs}>
         <span>
           <strong style={{ color: "#783988", fontSize: "25px" }}>/</strong>{" "}
           number of requests per second<br />
@@ -37,7 +39,7 @@ module.exports = class MultipleGrainGraphs extends React.Component {
           average latency in milliseconds
         </span>
         {this.mapGrainStats()}
-      </div>
+      </Page>
     );
   }
 
