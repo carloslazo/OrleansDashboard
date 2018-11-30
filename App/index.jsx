@@ -339,6 +339,7 @@ routie("/preferences", function() {
 
   render();
 });
+var savedGrains = storage.get("savedGrains") != undefined ? JSON.parse(storage.get("savedGrains")) : {}
 
 routie("/reports", function() {
   var thisRouteIndex = ++routeIndex;
@@ -346,10 +347,10 @@ routie("/reports", function() {
   scroll();
   renderLoading();
 
-  let deleteGrain = name => {
+  var deleteGrain = name => {
     savedGrains = { ...savedGrains };
     delete savedGrains[name];
-    savedGrainsString = JSON.stringify(savedGrains);
+    let savedGrainsString = JSON.stringify(savedGrains);
     storage.put("savedGrains", savedGrainsString);
     render();
   };
@@ -357,7 +358,7 @@ routie("/reports", function() {
   render = function() {
     if (routeIndex != thisRouteIndex) return;
     renderPage(
-      <Page>
+      <Page title="Reports">
         <SavedTable savedGrains={savedGrains} deleteGrain={deleteGrain} />
       </Page>,
       "#/reports"
@@ -366,7 +367,6 @@ routie("/reports", function() {
   render();
 });
 
-let savedGrains = storage.get("savedGrains") != undefined ? JSON.parse(storage.get("savedGrains")) : {}
 
 routie('/reports/:custom/json', function (custom) {
     var thisRouteIndex = ++routeIndex;
@@ -374,18 +374,32 @@ routie('/reports/:custom/json', function (custom) {
     scroll();
     renderLoading();
 
-    let getSavedGrain = (fieldInput, name) =>{
-      savedGrains = {...savedGrains,}
-      fieldInput = JSON.parse(fieldInput)
-      savedGrains[name] = fieldInput
-      savedGrainsString = JSON.stringify(savedGrains)
-      storage.put("savedGrains", savedGrainsString)
+    var getSavedGrain = (fieldInput, reportName, sluggedName) =>{
+      let savedGrainsString = JSON.stringify(savedGrains)
+      let parseTest
+      reportName = reportName.replace(/\r?\n|\r/g, " ")
+      //removes line break
+      try {
+        JSON.parse(fieldInput)
+        parseTest = true
+      } catch(e){
+        console.log(e);
+        ParseTest = false
+      }
+      if (parseTest){
+        fieldInput = JSON.parse(fieldInput)
+        savedGrains[sluggedName] = { fieldInput: fieldInput, reportName: reportName }
+        storage.put("savedGrains", savedGrainsString)
+        window.location = "/#/reports";
+      } else{
+        alert("JSON is invalid")
+      }
     }
 
 
     render = function () {
         if (routeIndex != thisRouteIndex) return;
-        renderPage(<Page title="Report form"><JsonTextForm getSavedGrain={getSavedGrain} CustomName={custom} savedGrains={savedGrains}/></Page>, "#/reports/json");
+        renderPage(<Page title="Report form"><JsonTextForm getSavedGrain={getSavedGrain} customName={custom} savedGrains={savedGrains}/></Page>, "#/reports/json");
     }
     render();
 
@@ -400,7 +414,7 @@ routie("/reports/:savedGraphs", function(savedGraphs) {
   renderLoading();
   var grainStats = {};
   var loadData = function() {
-    Object.keys(savedGrains[savedGraphs]).map(x => {
+    Object.keys(savedGrains[savedGraphs].fieldInput).map(x => {
       http.get("GrainStats/" + x, function(err, data) {
         grainStats[x] = data;
         render();
@@ -411,9 +425,8 @@ routie("/reports/:savedGraphs", function(savedGraphs) {
   render = function() {
     if (routeIndex != thisRouteIndex) return;
     renderPage(
-      <Page>
-        <Reports grainStats={grainStats} savedGrainReport={savedGrains[savedGraphs]} savedGraphs={savedGraphs}/>
-      </Page>,
+        <Reports grainStats={grainStats} savedGrainReport={savedGrains[savedGraphs].fieldInput} title={savedGrains[savedGraphs].reportName}/>
+  ,
       "#/reports"
     );
   };
@@ -478,6 +491,7 @@ function getMenu(){
     result.push({
       name:"Reports",
       path: "#/reports",
+      icon: "fa fa-book",
     })
 
 

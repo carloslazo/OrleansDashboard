@@ -1,25 +1,25 @@
 var React = require("react");
 const storage = require("../lib/storage");
 const JsonTextForm = require("../components/json-text-form.jsx");
+const Page = require("../components/page.jsx");
 
 module.exports = class CreateReports extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-
-    };
-
+    this.state = {};
   }
 
   render() {
-    return ( <JsonTextForm getSavedGrain={this.props.getSavedGrain} CustomName={this.props.CustomName} savedGrains={this.props.savedGrains} grainObjectExample={grainObjectExample}/>
-    )
+    return (
+      <JsonTextForm
+        getSavedGrain={this.props.getSavedGrain}
+        CustomName={this.props.CustomName}
+        savedGrains={this.props.savedGrains}
+        grainObjectExample={grainObjectExample}
+      />
+    );
   }
 };
-
-
-
-
 
 let grainObjectExample = {
   "OrleansDashboard.DashboardGrain": [
@@ -34,11 +34,8 @@ let grainObjectExample = {
 
 grainObjectExample = JSON.stringify(grainObjectExample);
 
-
-
-
 this.props.CustomName == "default"
   ? grainObjectExample
-  : JSON.stringify(this.props.savedGrains[this.props.CustomName])
+  : JSON.stringify(this.props.savedGrains[this.props.CustomName]);
 
-  this.props.CustomName == "default" ? "": this.props.CustomName
+this.props.CustomName == "default" ? "" : this.props.CustomName;

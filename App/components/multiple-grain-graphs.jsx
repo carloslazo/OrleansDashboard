@@ -27,7 +27,7 @@ module.exports = class MultipleGrainGraphs extends React.Component {
 
   renderGraphs() {
     return (
-      <Page  title={getName(this.props.savedGraphs)} subTitle={this.props.savedGraphs}>
+      <div>
         <span>
           <strong style={{ color: "#783988", fontSize: "25px" }}>/</strong>{" "}
           number of requests per second<br />
@@ -39,7 +39,7 @@ module.exports = class MultipleGrainGraphs extends React.Component {
           average latency in milliseconds
         </span>
         {this.mapGrainStats()}
-      </Page>
+        </div>
     );
   }
 

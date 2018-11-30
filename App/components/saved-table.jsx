@@ -13,17 +13,17 @@ module.exports = class SavedTable extends React.Component {
   }
 
   mapSavedObjects() {
-    return Object.keys(this.props.savedGrains).map(key => {
+    return Object.keys(this.props.savedGrains).map(x => {
       return (
-        <div key={key}>
-          <h3>{key}</h3>
-          <a onClick={this.handleDelete} name={key}>
-            Delete {key}
+        <div key={x}>
+          <h3>{this.props.savedGrains[x].reportName}</h3>
+          <a onClick={this.handleDelete} name={x}>
+            Delete {x}
           </a>
           <br />
-          <a href={`/#/reports/${key}/json`}>Edit {key}</a>
+          <a href={`/#/reports/${x}/json`}>Edit {x}</a>
           <br />
-          <a href={`#/reports/${key}`}>View {key}</a>
+          <a href={`#/reports/${x}`}>View {x}</a>
         </div>
       );
     });
@@ -33,7 +33,7 @@ module.exports = class SavedTable extends React.Component {
     return (
       <div>
         <h1>
-          <a href={`#/reports/Untitled/json`}>Add New</a>
+          <a href={`#/reports/untitled/json`}>Add New</a>
         </h1>
         {this.mapSavedObjects()}
       </div>

@@ -8,18 +8,26 @@ module.exports = class JsonTextForm extends React.Component {
     super(props);
     this.state = {
       fieldInput:
-        this.props.CustomName == "Untitled"
+        this.props.customName == "untitled"
           ? grainObjectExample
-          : JSON.stringify(this.props.savedGrains[this.props.CustomName]),
+          : JSON.stringify(
+              this.props.savedGrains[this.props.customName].fieldInput
+            ),
       savedName:
-        this.props.CustomName == "Untitled" ? undefined : this.props.CustomName
+        this.props.customName == "untitled"
+          ? "untitled"
+          : this.props.savedGrains[this.props.customName].reportName,
+      previousName:
+        this.props.customName == "untitled"
+          ? "untitled"
+          : this.props.savedGrains[this.props.customName].reportName
     };
     this.handleJsonSubmit = this.handleJsonSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
 
   handleChange(e) {
-    if (e.target.name === "name") {
+    if (e.target.name === "report-name") {
       this.setState({ savedName: e.target.value });
     } else if (e.target.name === "input") {
       this.setState({ fieldInput: e.target.value });
@@ -28,20 +36,27 @@ module.exports = class JsonTextForm extends React.Component {
 
   handleJsonSubmit(e) {
     e.preventDefault();
-    if (!Object.keys(this.props.savedGrains).includes(this.state.savedName)) {
-      this.props.getSavedGrain(this.state.fieldInput, this.state.savedName);
-      window.location = "http://localhost:8080/#/reports";
-    } else if (this.state.savedName == this.props.CustomName) {
-      this.props.getSavedGrain(this.state.fieldInput, this.state.savedName);
-      window.location = "http://localhost:8080/#/reports";
+    let slugedName = slugify(this.state.savedName);
+    if (!Object.keys(this.props.savedGrains).includes(slugedName)) {
+      this.props.getSavedGrain(
+        this.state.fieldInput,
+        this.state.savedName,
+        slugedName
+      );
+    } else if (slugedName == this.props.customName) {
+      this.props.getSavedGrain(
+        this.state.fieldInput,
+        this.state.savedName,
+        slugedName
+      );
     } else {
-      alert("Name must be unique. Case insensitive.");
+      alert("Name must be unique.");
     }
   }
 
   render() {
     return (
-      <Panel title={this.props.CustomName}>
+      <Panel title={this.state.previousName}>
         <div>
           <form type="text" onSubmit={this.handleJsonSubmit}>
             <div className="form-group">
@@ -49,7 +64,7 @@ module.exports = class JsonTextForm extends React.Component {
               <textarea
                 className="form-control"
                 rows="1"
-                name="name"
+                name="report-name"
                 value={this.state.savedName}
                 onChange={this.handleChange}
                 required
@@ -71,7 +86,17 @@ module.exports = class JsonTextForm extends React.Component {
     );
   }
 };
-
+function slugify(string) {
+  return string
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w\-]+/g, "")
+    .replace(/\-\-+/g, "-")
+    .replace(/^-+/, "")
+    .replace(/-+$/, "");
+}
 let grainObjectExample = {
   "OrleansDashboard.DashboardGrain": [
     "orleansDashboard.DashboardGrain.GetCounters",
